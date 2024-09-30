@@ -1,310 +1,299 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
-
-void fonction_affichage() {
-    printf("\n\t\t\033[0mLe programme offre les fonctionnalites suivantes :\n\n");
-    printf("\t\033[1;32m1: Ajouter un livre au stock.\n");
-    printf("\t\033[1;32m2: Afficher tous les livres disponibles\n");
-    printf("\t3: Mettre a jour la quantite d'un livre\n");
-   // printf("\t3: Rechercher un livre par son titre\n");
-    printf("\t4: Supprimer un livre du stock\n");
-    printf("\t5: Afficher le nombre total de livres en stock\n");
-    printf("\t0: Quitter le programme\n\n\033[0m");
-}
-
-int nb_livre() {
-    int nb;
-    char buffer[100];
-
-    while (1) {
-        
-         printf("\tChoisissez le nombre de livres que vous souhaitez ajouter : ");
-        fgets(buffer, sizeof(buffer), stdin);
-
-        // Verifie si tous les caracteres sont numeiques
-        int valid = 1;
-        for (int j = 0; buffer[j] != '\0'; j++) {
-            if (!isdigit(buffer[j]) && buffer[j] != '\n') {
-                valid = 0; // Si un caractere n'est pas un chiffre, on marque comme invalide
-                break;
-            }
-        }
-
-        // Si valide, convertir en entier
-        if (valid && sscanf(buffer, "%d", &nb) == 1 && nb > 0) {
-            return nb; // Retourne le nombre si valide
-        } else {
-            printf("\033[1;31m\n\n\t\tErreur : Veuillez entrer un nombre >=1.\033[0m\n\n");
-
-        }
-    }
-}
-
-int verifier_alphabets(char str[500]) {
-    for (int j = 0; str[j] != '\0'; j++) {
-        if (!isalpha(str[j]) && str[j] != ' ') {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int verifier_nombre(char str[100]) {
-    for (int j = 0; str[j] != '\0'; j++) {
-        if (!isdigit(str[j]) && str[j] != '\n') {
-            return 0; 
-        }
-    }
-    return 1; // 
-}
-
-void ajouter(int i, char titre[][500], char auteur[][500], float prix[], int quantite[]) {
-    char buffer[100];
-
-    
-    while (1) {
-        printf("\n\tEntrer Les donner de %d Livres: \n\n",i+1);
-        printf("\t\tTitre : ");
-        fgets(titre[i], sizeof(titre[i]), stdin);
-        titre[i][strcspn(titre[i], "\n")] = '\0'; 
-
-        if (strlen(titre[i]) == 0 || verifier_alphabets(titre[i]) == 0) {
-          printf("\n\t\033[1;31m!!!!! Erreur : Le titre contient des caracteres non alphabetiques.\033[0m\n");
-           printf("\n\n\033[1;35m\t\tResaisir le Titre!!!!\033[0m\n");
-        } else {
-            break;
-        }
-    }
-
-    // Ajouter l'auteur
-    while (1) {
-        printf("\t\tAuteur : ");
-        fgets(auteur[i], sizeof(auteur[i]), stdin);
-        auteur[i][strcspn(auteur[i], "\n")] = '\0'; // Enlever le saut de ligne
-
-        if (strlen(auteur[i]) == 0 || verifier_alphabets(auteur[i]) == 0) {
-        printf("\n\t\033[1;31m!!!!! Erreur : l'auteur contient des caracteres non alphabetiques.\033[0m\n");
-            printf("\n\n\033[1;35m\t\tResaisir l'auteur!!!!\033[0m\n\n");
-        } else {
-            break;
-        }
-    }
-
-    // Ajouter le prix
-    while (1) {
-        printf("\t\tPrix: ");
-        fgets(buffer, sizeof(buffer), stdin);
-
-        if (verifier_nombre(buffer) && sscanf(buffer, "%f", &prix[i]) == 1 && prix[i] >= 0) {
-            break;
-        } else {
-            printf("\n\t\033[1;31m!!!!! Erreur : le Prix contient des caracteres non Numeriques.\033[0m\n");
-            printf("\n\n\n\t\t\033[1;35mResaisir le Prix!!!!\033[0m \n\n");
-
-        }
-    }
-
-    // Ajouter la quantit
-    while (1) {
-        printf("\t\tQuantite: ");
-        fgets(buffer, sizeof(buffer), stdin);
-
-        if (verifier_nombre(buffer) && sscanf(buffer, "%d", &quantite[i]) == 1 && quantite[i] >= 0) {
-            break;
-        } else {
-            printf("\n\t\033[1;31m!!!!! Erreur : la Quantite contient des caracteres non Numeriques.\033[0m\n");
-            printf("\n\n\n\t\t\033[1;35mResaisir la Quantite!!!!\033[0m \n\n");
-        }
-    }
-}
-
-void affichage_tableau(int nb, char titre[][500], char auteur[][500], float prix[], int quantite[]) {
-  if (nb == 0) {
-    printf("\n\t\t\033[1;31m Ooops!!!!! Aucun livre n'a ?t? ajout? au stock.\n\n");
-} else {
-    
-    printf("\n\n\t***** Affichage de Tous les Livres Disponibles *****\n\n");
-    printf("\t%-15s %-15s %-10s %-10s\n", "Titre", "Auteur", "Prix", "Quantit?");
-    printf("\t-----------------------------------------------------\n");
-
-    for (int i = 0; i < nb; i++) {
-        if (titre[i][0] != '\0') { 
-            printf("\t%-15s %-15s %-10.2f %-10d\n", titre[i], auteur[i], prix[i], quantite[i]);
-        }
-    }
-
-    printf("\n\t***********************************************\n\n");
-}
-
-    
-}
-
-int verifier_saisir_nombre() {
-    char buffer[100];
-    int valid;
-
-    while (1) {
-         printf("-->\n\n\t\033[0mChoisir un nombre entre 0 et 6 : ");
-        fgets(buffer, sizeof(buffer), stdin);
-        
-        // Enleve le saut de ligne
-        buffer[strcspn(buffer, "\n")] = 0;
-
-        // Veifie si la chaine represente un nombre
-        valid = 1; // Supposer que c'est valide
-        for (int j = 0; buffer[j] != '\0'; j++) {
-            if (!isdigit(buffer[j])) {
-                valid = 0; 
-                break;
-            }
-        }
-
-        if (valid) {
-            int n = atoi(buffer);
-            if (n >= 0 && n<=5) {
-                return n; // Retourne le nombre si valide
-            } else {
-            printf("\033[1;31m\n\n\t\tErreur : Veuillez entrer un nombre valide entre 0 et 6.\033[0m\n\n");
-
-            }
-        } else {
-            printf("\033[1;31m\n\n\t\tErreur : Veuillez entrer un nombre valide entre 0 et 6.\033[0m\n\n");
-
-        }
-    }
-}
-
-void mettre_a_jour_quantite(int nb, char titre[][500], int quantite[]) {
-    char livre[500];
-    int nv;
-
-    printf("\n\n\t\tSaisir le titre du livre ? rechercher : ");
-    fgets(livre, sizeof(livre), stdin);
-    livre[strcspn(livre, "\n")] = 0; // Supprime le saut de ligne
-
-    for (int i = 0; i < nb; i++) {
-        if (strcmp(titre[i], livre) == 0) {
-            printf("\t\tLivre trouv? :\n\n");
-            printf("\tTitre : %s\n", titre[i]);
-            printf("\tQuantite: %d\n", quantite[i]);
-            printf("\n\n\t\tSaisir la nouvelle quantite: ");
-
-            char buffer[100];
-            while (1) {
-                fgets(buffer, sizeof(buffer), stdin);
-                if (verifier_nombre(buffer) && sscanf(buffer, "%d", &nv) == 1 && nv >= 0) {
-                    quantite[i] = nv; // Met a jour 
-                    printf("\n\n\t\t ** \033[1;33mQuantit? mise ? jour avec succ?s ! \033[1;0m**\n\n");
-                    return;
-                } else {
-                    printf("\n\n\t\033[1,31mErreur : Veuillez entrer une quantit? valide (nombre entier positif).\033[1;0m\n");
-                    printf("\t\033[1;35mReSaisir la nouvelle quantite : \033[1;0m");
-                }
-            }
-        }
-    }
-
-    printf("\t\033[1;31m !!! Aucun livre trouve avec ce titre.\n");
-}
-void supprimer_livre(int nb, char titre[][500], char auteur[][500], float prix[], int quantite[]) {
-    char livre[500];
-    printf("\n\t\tEntrez le titre du livre supprimer : ");
-    fgets(livre, sizeof(livre), stdin);
-    livre[strcspn(livre, "\n")] = 0; // Supprime le saut de ligne
-
-    int found = 0; // Pour veifier si le livre 
-
-    for (int i = 0; i < nb; i++) {
-        if (strcmp(titre[i], livre) == 0 && titre[i][0] != '\0') { 
-            titre[i][0] = '\0'; 
-            auteur[i][0] = '\0'; 
-            prix[i] = 0; 
-            quantite[i] = 0; 
-            found = 1; 
-            printf("Livre '%s' supprime avec succes.\n", livre);
-            break; 
-        }
-    }
-
-    if (!found) {
-        printf("\n\n\t\033[1;31mLivre non trouve\033[0m\n"); // Affiche une erreur si le livre n'est pas trouv?
-    }
-}
-
-void afficher_nombre_total(int nb, int quantite[]) {
-    int total = 0;
-    for (int i = 0; i < nb; i++) {
-        total += quantite[i]; // Additionne toutes les quantit?s
-    }
-    printf("\n\t\tTotal de livres en stock : %d\n\n", total);
-}
-
-
-
+#include <ctype.h>
 
 int main() {
-    
-    
-    printf("\033[1;31m\n\n\t\tMini-Projet : Syst?me de Gestion de Stock dans une Librairie\n\033[0m");
-    fonction_affichage();
-    printf("\n\n\t\033[1;34mNoter Bien!!!!!! Aucun livre n'a ete ajoute au stock au debut.\n\n\033[0m");
+    printf("\033[1;31m\n\n\t\tMini-Projet : Systeme de Gestion de Stock dans une Librairie\n");
 
-   
-    //declaration des variable 
-    int nb=0;
-    char titre[nb][500], auteur[nb][500];
+    // D�claration
+    char titre[100][100];
+    char auteur[100][100];
     float prix[100];
-    int quantite[100],choix;
-    //traiter les cas 
-    
-    do{
-         choix=verifier_saisir_nombre();
-        switch(choix){
-        case 1:{
-            printf("\033[1;36m\n\t\tBienvenue sur la phase d'ajout d'un ou plusieurs livres au stock\033[0m\n\n");
-              nb = nb_livre();
-             for (int i = 0; i < nb; i++){
-                 ajouter(i, titre, auteur, prix, quantite);
-             }
-            break;
-        }//fin de case 1
-         
-        case 2:{
-            affichage_tableau(nb, titre, auteur, prix, quantite);
-            break;
-        }//fin de case 2
-        
-        case 3:{
-            supprimer_livre(nb, titre, auteur, prix, quantite);
-            break;
-        } //fin case 3 
-        
-        case 4:{
-           mettre_a_jour_quantite(nb,titre,quantite);
-            break;
-        } //fin case 4
-        
-        case 5:{
-           printf("\033[1;36m\n\t\tBienvenue sur la phase d'ajout d'un ou plusieurs livres au stock\033[0m\n\n");
-           nb = nb_livre();
-           for (int i = 0; i < nb; i++) {
-                ajouter(i, titre, auteur, prix, quantite);
-            }
-            afficher_nombre_total(nb, quantite); // Affiche le total apr?s ajout
-    break;
+    int quantite[100];
+    int choix, nmb = 0;
+    int valide;
 
+    // Affichage des livres au d�but
+    printf("\n\n\t\033[1;34mNoter Bien!!!!!! Aucun livre n'a ete ajoute au stock au debut.\n\n");
+
+    // R�p�ter jusqu'�
+    do {
+        printf("\n\t\t\033[0mLe programme offre les fonctionnalites suivantes :\n\n");
+        printf("\t\033[1;32m1: Ajouter un livre au stock.\n");
+        printf("\t\033[1;32m2: Afficher tous les livres disponibles\n");
+        printf("\t3: Rechercher un livre par son titre\n");
+        printf("\t4: Mettre a jour la quantite d'un livre\n");
+        printf("\t5: Supprimer un livre du stock\n");
+        printf("\t6: Afficher le nombre total de livres en stock\n");
+        printf("\t0: Quitter le programme\n\n");
+
+        // Traitement du choix
+        // do {
+        //     printf("-->\t\033[0mChoisir un nombre entre 0 et 6 : ");
+        //     valide = scanf("%d", &choix);
+
+        //     if (valide != 1 || choix < 0 || choix > 6) {
+        //         printf("\033[1;31m\n\n\t\tErreur : Veuillez entrer un nombre valide entre 0 et 6.\033[0m\n\n");
+        //         while (getchar() != '\n');  // Vide  en cas d'entr�e incorrecte
+        //     }
+        // } while (valide != 1 || choix < 0 || choix > 6);
+
+       do {
+        char input[100];
+        printf("-->\t\033[0mChoisir un nombre entre 0 et 6 : ");
+        //scanf("%s", input); // Lire l'entrée comme chaîne de caractères
+        fgets(input,sizeof(input),stdin);
+        //input[strcspn(input, "\n")] = '\0';
+        getchar();
+        valide = 1; // Supposons que l'entrée est valide
+
+        // Vérifier que chaque caractère de la chaîne est un chiffre et qu'il n'y a pas d'espace
+        for (int i = 0; i < strlen(input); i++) {
+            if (input[i] == ' ') {
+                printf("\033[1;31m\n\n\t\tErreur : Les espaces sont interdits. Veuillez ressaisir un nombre.\033[0m\n\n");
+                valide = 0; // Invalide car il y a un espace
+                break; // Sortir de la boucle for
+            }
+            if (!isdigit(input[i])) {
+                printf("\033[1;31m\n\n\t\tErreur : Veuillez entrer uniquement des chiffres.\033[0m\n\n");
+                valide = 0; // Invalide car il y a un caractère non numérique
+                break; // Sortir de la boucle for
+            }
         }
-        default:{
-            printf("Rien fiat!!!"); 
-            break;
+
+        // Si l'entrée est valide, convertir en entier
+        if (valide) {
+            choix = atoi(input); // Convertir la chaîne en entier
         }
-    
-    } //fin switch
-    }while(choix!=0);
-    
+
+        // Vérifier si l'entrée est un nombre valide entre 0 et 6
+        if (valide && (choix < 0 || choix > 6)) {
+            printf("\033[1;31m\n\n\t\tErreur : Veuillez entrer un nombre valide entre 0 et 6.\033[0m\n\n");
+            valide = 0; // Refaire la boucle si l'entrée est invalide
+        }
+
+    } while (!valide);
+    //
+        // switch pour le traitement des cas
+        switch (choix) {
+            case 1: {
+                if (nmb >= 100) {
+                    printf("!!!!Erreur : La capacite maximale de livres est atteinte.\n");
+                    break;
+                }
+
+                printf("\033[1;36m\n\t\tBienvenue sur la phase d'ajout d'un livre au stock\033[0m\n\n");
+                int nb_saisir;
+                printf("\tEst-ce que vous voulez ajouter un livre ou plusieurs livres?\n");
+                g:
+                printf("\t\t0: Ajouter un livre\n");
+                printf("\t\t1: Ajouter plusieurs livres\n\n");
+
+                // 1 ou n livre entrer
+                while (1) {
+                    printf("\tDonnez moi un numero de votre choix (0 || 1) : ");
+                    if (scanf("%d", &nb_saisir) != 1 || (nb_saisir != 0 && nb_saisir != 1)) {
+                        printf("\033[1;31m\n\n\t\tErreur : Veuillez entrer 0 ou 1.\033[0m\n\n");
+                        while (getchar() != '\n'); // Vider
+                    } else {
+                        break;
+                    }
+                }
+
+                if (nb_saisir == 0) {
+                    nb_saisir = 1;
+                } else if (nb_saisir == 1) {
+                    do {
+                        printf("\tCombien de livres voulez-vous ajouter ? ");
+                        valide = scanf("%d", &nb_saisir);
+
+                        if (valide != 1 || nb_saisir < 2) {
+                            printf("\033[1;31m\n\n\t\tErreur : Veuillez entrer un nombre entier valide superieur ou �gal � 2.\033[0m\n\n");
+                            while (getchar() != '\n');
+                        }
+                    } while (valide != 1 || nb_saisir < 2);
+                }
+
+                //  ajouter les livres
+                for (int i = 0; i < nb_saisir; i++) {
+                    int existe = 0;
+                    printf("\tSaisir les informations du livre %d :\n\n", nmb + 1);
+
+                    // Saisie et validation du titre
+                    e:
+                    printf("\t\tTitre : ");
+                    scanf(" %[^\n]", titre[nmb]); //condition sur l'espace
+
+                    for (int j = 0; titre[nmb][j] != '\0'; j++) {
+                        if (!isalpha(titre[nmb][j]) && titre[nmb][j] != ' ') {
+                            printf("\n\t\033[1;31m!!!!! Erreur : Le titre contient des caracteres non alphabetiques.\033[0m\n");
+                            printf("\n\n\033[1;35m\t\tResaisir le titre!!!!\033[0m\n");
+                            goto e;
+                        }
+                    }
+
+                    // Traitement de  l'auteur
+                    a:
+                    printf("\t\tAuteur : ");
+                    scanf(" %[^\n]", auteur[nmb]); // Accepte les espaces dans le nom de l'auteur
+                    for (int j = 0; auteur[nmb][j] != '\0'; j++) {
+                        if (!isalpha(auteur[nmb][j]) && auteur[nmb][j] != ' ') {
+                            printf("\n\t\033[1;31m!!!!! Erreur : L'auteur contient des caracteres non alphabetiques.\033[0m\n");
+                            printf("\n\n\n\t\t\033[1;35mResaisir le nom de l'auteur!!!!\033[0m \n");
+                            goto a;
+                        }
+                    }
+
+                    // Saisie du prix
+                    do {
+                        printf("\t\tPrix : ");
+                        valide = scanf("%f", &prix[nmb]);
+                        if (valide != 1) {
+                            printf("\033[1;31m\n\t\t!!! Erreur : Vous devez entrer un nombre valide pour le prix.\033[0m\n\n");
+                            while (getchar() != '\n');
+                        }
+                    } while (valide != 1);
+
+                    // Saisie de la quantit�
+                    do {
+                        printf("\t\tQuantite : ");
+                        valide = scanf("%d", &quantite[nmb]);
+                        if (valide != 1) {
+                            printf("\033[1;31m\n\t\t!!!! Erreur : Vous devez entrer un nombre valide pour la quantite.\033[0m\n\n");
+                            while (getchar() != '\n');
+                        }
+                    } while (valide != 1);
+
+                    nmb++;
+                    printf("\t\t\033[1;33mLivre ajoute avec succes !\033[0m\n");
+                }
+                break;
+            }
+
+            case 2: {
+                if (nmb == 0) {
+                    printf("\n\t\t\033[1;31m Ooops!!!!! Aucun livre n'a ete ajoute au stock.\n\n");
+                } else {
+                    printf("\n\n\t***** Affichage de Tous les Livres Disponibles *****\n\n");
+                    printf("\t%-15s %-15s %-10s %-10s\n", "Titre", "Auteur", "Prix", "Quantite");
+                    printf("\t-----------------------------------------------------\n");
+                    for (int i = 0; i < nmb; i++) {
+                        printf("\t%-15s %-15s %-10.2f %-10d\n", titre[i], auteur[i], prix[i], quantite[i]);
+                    }
+                    printf("\n\t***********************************************\n\n");
+                }
+                break;
+            }
+
+            // Recherche par titre
+            case 3: {
+                char recherche[100];
+                printf("Saisir le titre du livre a rechercher : ");
+                scanf(" %[^\n]", recherche);
+                int found = 0;
+
+                for (int i = 0; i < nmb; i++) {
+                    if (strcmp(titre[i], recherche) == 0) {
+                        printf("Livre trouve :\n");
+                        printf("\tTitre : %s\n", titre[i]);
+                        printf("\tAuteur : %s\n", auteur[i]);
+                        printf("\tPrix : %.2f\n", prix[i]);
+                        printf("\tQuantite : %d\n", quantite[i]);
+                        found = 1;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    printf("\t\033[1;31m !!! Aucun Livre trouve par ce titre \n");
+                }
+                break;
+            }
+
+            //  Mettre � jour la Qt
+            case 4: {
+                char recherche[100];
+                printf("\t\033[0mSaisir le titre du livre a mettre a jour : ");
+                scanf(" %[^\n]", recherche);
+                int found = 0;
+
+                for (int i = 0; i < nmb; i++) {
+                    if (strcmp(titre[i], recherche) == 0) {
+                        printf("\tLivre trouve :\n");
+                        printf("\tTitre : %s\n", titre[i]);
+                        printf("\tAuteur : %s\n", auteur[i]);
+                        printf("\tPrix : %.2f\n", prix[i]);
+                        printf("\tQuantite actuelle : %d\n", quantite[i]);
+
+                        printf("\n\tNouvelle quantite : ");
+                        int nouvelleQuantite;
+                        valide = scanf("%d", &nouvelleQuantite);
+                        if (valide == 1 && nouvelleQuantite >= 0) {
+                            quantite[i] = nouvelleQuantite;
+                            printf("\n\t\t\033[1;32mQuantite mise a jour avec succes !\n");
+                        } else {
+                            printf("\033[1;31m\n\t\t!!! Erreur : Vous devez entrer un nombre valide pour la quantite.\033[0m\n\n");
+                        }
+                        found = 1;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    printf("\t\033[1;31m !!! Aucun Livre trouve par ce titre \n");
+                }
+                break;
+            }
+
+            //  Supprimer
+            case 5: {
+                char recherche[100];
+                printf("Saisir le titre du livre a supprimer : ");
+                scanf(" %[^\n]", recherche);
+                int found = 0;
+
+                for (int i = 0; i < nmb; i++) {
+                    if (strcmp(titre[i], recherche) == 0) {
+                        printf("\tLivre trouve et supprime : %s\n", titre[i]);
+                        for (int j = i; j < nmb - 1; j++) {
+                            strcpy(titre[j], titre[j + 1]);
+                            strcpy(auteur[j], auteur[j + 1]);
+                            prix[j] = prix[j + 1];
+                            quantite[j] = quantite[j + 1];
+                        }
+                        nmb--;
+                        found = 1;
+                        printf("\n\t\033[1;32mLivre supprime avec succes !\033[0m\n");
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    printf("\033[1;31m !!! Aucun Livre trouve par ce titre \n");
+                }
+                break;
+            }
+
+            // Afficher le nombre total
+            case 6: {
+                printf("\033[1;36m\n\n\t\tLe nombre total de livres en stock est de : %d\033[0m\n\n", nmb);
+                break;
+            }
+
+            //  Quitter
+            case 0: {
+                printf("\033[1;36m\n\n\t\tMerci d'avoir utilise notre application. A bientot!\033[0m\n");
+                break;
+            }
+
+            default: {
+                printf("\n\t\t\033[1;31mOption non valide !\033[0m\n");
+                break;
+            }
+        }
+
+    } while (choix != 0);
 
     return 0;
 }
-
